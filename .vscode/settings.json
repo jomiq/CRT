@@ -1,0 +1,23 @@
+{
+    "workbench.colorCustomizations": {
+        "statusBar.background" : "#0ca163"
+    },
+    "files.associations": {
+        "*.m": "matlab",
+        "*.py_": "python",
+        "hal.h": "c",
+        "stm32_gpio.h": "c",
+        "rt_test_root.h": "c",
+        "rt_test_sequence_001.h": "c",
+        "nu_can.h": "c",
+        "ch.h": "c",
+        "chcore.h": "c",
+        "cmparams.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Enabled",
+    "git.autoRepositoryDetection": "subFolders",
+    "python.pythonPath": "/bin/python",
+    "git.ignoredRepositories": [
+        "ChibiOS"
+    ]
+}
