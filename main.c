@@ -16,9 +16,11 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "portab.h"
 
 #include "project.h"
-#include "blink.h"
+//#include "blink.h"
+#include "crl.h"
 
 /* 
  * Application entry point.
@@ -35,21 +37,31 @@ int main(void) {
   halInit();
   chSysInit();
 
+  crl_start();
+
   /*
    * Activates the serial driver 3 using the driver default configuration.
    */
-  sdStart(&SD3, NULL);
+  //sdStart(&SD3, NULL);
   /*
    * Creates the blinky thread.
    */
-  chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO + 1, Thread1, NULL);
+  //chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO + 1, Thread1, NULL);
 
   /*
    * Normal main() thread activity, in this demo it does nothing except
    * sleeping in a loop and check the button state.
    */
   while (true) {
+    //chThdSleepMilliseconds(500);
+    //sdWrite(&SD3, (uint8_t*) READY_MSG, READY_MSG_N);
+    
+    if (palReadLine(PORTAB_LINE_BUTTON) == PORTAB_BUTTON_PRESSED) {
+      gptStopTimer(&GPTD6);
+      dacStopConversion(&DACD1);
+      dacStopConversion(&DACD2);
+      palToggleLine(LINE_LED3);
+    }
     chThdSleepMilliseconds(500);
-    sdWrite(&SD3, (uint8_t*) READY_MSG, READY_MSG_N);
   }
 }

@@ -3,6 +3,7 @@
         "statusBar.background" : "#0ca163"
     },
     "files.associations": {
+        "*.make": "makefile",
         "*.m": "matlab",
         "*.py_": "python",
         "hal.h": "c",
