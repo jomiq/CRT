@@ -5,15 +5,21 @@
 #include "portab.h"
 #include "crl.h"
 
+#define CRL_LOW_X   CRL_X_MARGIN
+#define CRL_HIGH_X  4096U - CRL_X_MARGIN
+#define CRL_LOW_Y   CRL_Y_MARGIN
+#define CRL_HIGH_Y  4096U - CRL_Y_MARGIN
 
-#define CRL_VSTEPY 4096U/CRL_RES_Y
-#define CRL_VSTEPX 4096U/CRL_RES_X
+#define CRL_VSTEPX (CRL_HIGH_X-CRL_LOW_X)/CRL_RES_X
+#define CRL_VSTEPY (CRL_HIGH_Y-CRL_LOW_Y)/CRL_RES_Y
+
 /**
  * callback at end of line
  *
  **/
 
 static void line_end(DACDriver *dacp);
+
 
 static const DACConfig X_dac1cfg1 = {
     .init = 2047U,

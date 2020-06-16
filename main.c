@@ -13,7 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-
+#include <stdlib.h>
 #include "ch.h"
 #include "hal.h"
 #include "portab.h"
@@ -22,11 +22,14 @@
 //#include "blink.h"
 #include "crl.h"
 
+
+
+uint8_t img[CRL_RES_X*CRL_RES_Y/4U];
+
 /* 
  * Application entry point.
  */
 int main(void) {
-
   /*
    * System initializations.
    * - HAL initialization, this also initializes the configured device drivers
@@ -37,7 +40,21 @@ int main(void) {
   halInit();
   chSysInit();
 
-  crl_start();
+  /**
+   * Fill the buffer with some nonsense.
+   * 
+   * */
+  /**
+  for(size_t j = 0; j < CRL_RES_Y; j++){
+    for(size_t i = 0; i < CRL_RES_X/CRL_RES_Z; i++){
+      img[j*CRL_RES_X + i] = 0b11100100U;
+    }
+  }*/
+  for(size_t j = 0; j < CRL_RES_X*CRL_RES_Y/4U; j++){
+    img[j] = 0b11100100U;
+  }
+
+  crl_start(img);
 
   /*
    * Activates the serial driver 3 using the driver default configuration.

@@ -13,12 +13,47 @@
         "nu_can.h": "c",
         "ch.h": "c",
         "chcore.h": "c",
-        "cmparams.h": "c"
+        "cmparams.h": "c",
+        "array": "cpp",
+        "atomic": "cpp",
+        "hash_map": "cpp",
+        "*.tcc": "cpp",
+        "concepts": "cpp",
+        "cstddef": "cpp",
+        "cstdio": "cpp",
+        "cstring": "cpp",
+        "cwchar": "cpp",
+        "vector": "cpp",
+        "functional": "cpp",
+        "memory": "cpp",
+        "memory_resource": "cpp",
+        "optional": "cpp",
+        "string_view": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "random": "cpp",
+        "fstream": "cpp",
+        "initializer_list": "cpp",
+        "new": "cpp",
+        "ranges": "cpp",
+        "stdexcept": "cpp",
+        "string": "cpp",
+        "system_error": "cpp",
+        "thread": "cpp",
+        "ratio": "cpp",
+        "typeinfo": "cpp",
+        "utility": "cpp",
+        "valarray": "cpp",
+        "ctime": "cpp",
+        "cstdlib": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "git.autoRepositoryDetection": "subFolders",
     "python.pythonPath": "/bin/python",
     "git.ignoredRepositories": [
         "ChibiOS"
+    ],
+    "editor.rulers": [
+        80 
     ]
 }
