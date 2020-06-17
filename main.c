@@ -19,12 +19,11 @@
 #include "portab.h"
 
 #include "project.h"
-//#include "blink.h"
 #include "crl.h"
+#include "image.h"
 
 
-
-uint8_t img[CRL_RES_X*CRL_RES_Y/4U];
+uint8_t img[CRL_RES_X*CRL_RES_Y/2U];
 
 /* 
  * Application entry point.
@@ -50,8 +49,8 @@ int main(void) {
       img[j*CRL_RES_X + i] = 0b11100100U;
     }
   }*/
-  for(size_t j = 0; j < CRL_RES_X*CRL_RES_Y/4U; j++){
-    img[j] = 0b11100100U;
+  for(size_t j = 0; j < CRL_RES_X*CRL_RES_Y/2U; j++){
+    img[j] = testimage[j];
   }
 
   crl_start(img);
@@ -63,7 +62,6 @@ int main(void) {
   /*
    * Creates the blinky thread.
    */
-  //chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO + 1, Thread1, NULL);
 
   /*
    * Normal main() thread activity, in this demo it does nothing except

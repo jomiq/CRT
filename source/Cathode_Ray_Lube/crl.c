@@ -3,11 +3,13 @@
 #include "crl.h"
 
 uint8_t * IMG_BFR;
-dacsample_t LINE_BFR[2][CRL_LINE_LEN];
+dacsample_t LINE_BFR0[CRL_LINE_LEN];
+dacsample_t LINE_BFR1[CRL_LINE_LEN];
 
-size_t  LINE = 0;
-uint8_t CNT = 0;
-uint8_t ODD = FALSE;
+
+size_t  line = 0;
+dacsample_t *free_line = LINE_BFR0;
+dacsample_t *active_line = LINE_BFR1;
 
 void crl_start(uint8_t * img){
     /* Point to the buffer */
@@ -25,37 +27,15 @@ void crl_start(uint8_t * img){
 
 
     /* Starting a continuous conversion.*/
-    LINE = 0;
-    ODD = FALSE;
-    render_line(0);
-    line_end(&DACD1);
+    line = 0;
+    render_line(line);
+    dacPutChannelX(&DACD2, 1, (dacsample_t) line*CRL_VSTEPY);
     gptStartContinuous(&GPTD6, 2U);
+    dacStartConversion(&DACD1, &dacgrpcfg1, (dacsample_t *)free_line, CRL_LINE_LEN);    
+
     /* GO */
 
 }
-
-// void fill_bfr(size_t L){
-//     size_t line_p = L * CRL_LINE_LEN;
-//     if(ODD) // 
-//     {
-//         for(size_t i = 0; i < CRL_LINE_LEN; i++)
-//         {
-//             LINE_BFR[0][i] = (dacsample_t) IMG_BFR[line_p + i];
-//             line_p++;
-//             //LINE_BFR[0][i] = (dacsample_t) 0;
-//         }
-//     }
-//     else
-//     {
-//         for(size_t i = 0; i < CRL_LINE_LEN; i++)
-//         {
-//             LINE_BFR[1][i] = (dacsample_t) IMG_BFR[line_p];
-//             line_p++;
-//             //LINE_BFR[1][i] = (dacsample_t) 4095;
-//         }
-//     }
-//     ODD = !ODD;
-// };
 
 /**
  * This rather complicated thing is basically rendering the image one line at a 
@@ -64,23 +44,25 @@ void crl_start(uint8_t * img){
  *   
 */
 
-#define MASK 0b11U
+#define MASK 0b1111U
 void render_line(size_t L){
-    
+    /*for(size_t i = 0; i < CRL_LINE_LEN; i++){
+        free_line[i] = (dacsample_t)4U*i;
+    }
+    */
     size_t n;
-    size_t linestart = L * CRL_RES_X/CRL_RES_Z;
+    size_t linestart = L * CRL_RES_X/2U;
     dacsample_t value;
 
     n = 0;
     value = CRL_LOW_X;
-
     uint8_t j;
-    for(size_t b = linestart; b < linestart + CRL_RES_X/CRL_RES_Z; b++){
-        for(uint8_t i = 0; i < 8; i = i+2U){
+    for(size_t b = linestart; b < linestart + CRL_RES_X/2U; b++){
+        for(uint8_t i = 0; i < 8; i = i+4U){
             j = (IMG_BFR[b] >> i)  & MASK;
             if(j){
                 while(j){
-                    LINE_BFR[!ODD][n++] = value;
+                    free_line[n++] = value;
                     j--;
                 }
             }
@@ -89,54 +71,29 @@ void render_line(size_t L){
     }
     while (n < CRL_LINE_LEN)
     {
-        LINE_BFR[!ODD][n++] = 4095U;
+        free_line[n++] = 4095U;
     }
-
-    ODD = !ODD;
 }
 #undef MASK
 
-void fill_bfr(size_t L){
-    size_t line_p = L * CRL_LINE_LEN;
-    if(ODD) // 
-    {
-        for(size_t i = 0; i < CRL_LINE_LEN; i++)
-        {
-            LINE_BFR[0][i] = (dacsample_t) IMG_BFR[line_p + i];
-            line_p++;
-            //LINE_BFR[0][i] = (dacsample_t) 0;
-        }
-    }
-    else
-    {
-        for(size_t i = 0; i < CRL_LINE_LEN; i++)
-        {
-            LINE_BFR[1][i] = (dacsample_t) IMG_BFR[line_p];
-            line_p++;
-            //LINE_BFR[1][i] = (dacsample_t) 4095;
-        }
-    }
-    ODD = !ODD;
-};
-
-
 static void line_end(DACDriver *dacp){
 
-    //dacPutChannelX(&DACD1, 1, (dacsample_t) 0);
-
-    dacStopConversion(dacp);
-    palClearLine(PORTAB_LINE_FRAMESYNC);
-    dacPutChannelX(&DACD2, 2, (dacsample_t) LINE*CRL_VSTEPY);
-    dacStartConversion(dacp, &dacgrpcfg1, (dacsample_t *)LINE_BFR[ODD], CRL_LINE_LEN/((size_t)2));
+    dacsample_t * tmp = free_line;
+    free_line = active_line;
+    active_line = tmp;   
+    dacStopConversion(&DACD1);
     
-    if(LINE >= CRL_LINE_N)
+    //dacPutChannelX(&DACD1, 0, (dacsample_t) 0U);
+    
+    dacPutChannelX(&DACD2, 1, (dacsample_t) line*CRL_VSTEPY);
+    dacStartConversion(dacp, &dacgrpcfg1, (dacsample_t *)active_line, CRL_LINE_LEN);
+    palClearLine(PORTAB_LINE_FRAMESYNC);
+    line++;
+    if(line >= CRL_LINE_N)
     {
         palSetLine(PORTAB_LINE_FRAMESYNC);
-        LINE = 0;
+        line = 0;
     }
-    //palClearLine(PORTAB_LINE_LINESYNC);
-    LINE++;
-    render_line(LINE);
+    render_line(line);
 
-    palToggleLine(PORTAB_LINE_LINESYNC);
 }

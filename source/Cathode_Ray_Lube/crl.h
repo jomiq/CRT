@@ -2,10 +2,10 @@
 #define __CRL_H__
 
 // Module master settings
-#define CRL_FREQ  1000000U   // TIM6 frequency setting. This is the pixel clock.
+#define CRL_FREQ  50000000U  // TIM6 frequency setting. This is the pixel clock.
 #define CRL_RES_X 320U       //
 #define CRL_RES_Y 240U       //
-#define CRL_RES_Z 4U        // Effective grayscale resolution of image. 
+#define CRL_RES_Z 16U        // Effective grayscale resolution of image. 
 
 // Limits
 #define CRL_X_MARGIN    512U

@@ -49,7 +49,7 @@
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "git.autoRepositoryDetection": "subFolders",
-    "python.pythonPath": "/bin/python",
+    "python.pythonPath": "/home/jomik/miniconda3/envs/bleeding_edge/bin/python",
     "git.ignoredRepositories": [
         "ChibiOS"
     ],
