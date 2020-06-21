@@ -42,15 +42,17 @@ int main(void) {
   /**
    * Fill the buffer with some nonsense.
    * 
-   * */
-  /**
+   * 
+  
   for(size_t j = 0; j < CRL_RES_Y; j++){
     for(size_t i = 0; i < CRL_RES_X/CRL_RES_Z; i++){
-      img[j*CRL_RES_X + i] = 0b11100100U;
+      img[j*CRL_RES_X + i] = 0x00U;
     }
   }*/
-  for(size_t j = 0; j < CRL_RES_X*CRL_RES_Y/2U; j++){
+  for(
+    size_t j = 0; j < CRL_RES_X*CRL_RES_Y/2U; j++){
     img[j] = testimage[j];
+    //img[j] = 0xFFU;
   }
 
   crl_start(img);

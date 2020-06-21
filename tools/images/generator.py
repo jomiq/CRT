@@ -1,6 +1,6 @@
 from PIL import Image
 
-image = Image.open("test.png")
+image = Image.open("invert.png")
 pixels = image.load()
 
 for y in range(240):

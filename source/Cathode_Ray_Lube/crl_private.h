@@ -5,17 +5,36 @@
 #include "portab.h"
 #include "crl.h"
 
-#define CRL_LOW_X   CRL_X_MARGIN
-#define CRL_HIGH_X  4095U - CRL_X_MARGIN
-#define CRL_LOW_Y   CRL_Y_MARGIN
-#define CRL_HIGH_Y  2047U - CRL_Y_MARGIN
+#define CRL_PPB   2U         // Pixels per byte.
 
-#define CRL_VSTEPX (CRL_HIGH_X-CRL_LOW_X)/CRL_RES_X
+#define CRL_LOW_X   CRL_X_MARGIN
+#define CRL_HIGH_X  (dacsample_t)4095U - CRL_X_MARGIN
+#define CRL_LOW_Y   CRL_Y_MARGIN
+#define CRL_HIGH_Y  (dacsample_t)4095U - CRL_Y_MARGIN
+
+#ifdef CRL_4BIT
+#define CRL_RES_Z 16U         // Effective grayscale resolution of image. 
+#define CRL_MASK  0b1111
+#endif
+#ifdef CRL_3BIT
+#define CRL_RES_Z 8U         // Effective grayscale resolution of image. 
+#define CRL_MASK  0b0111
+#endif
+
+#define CRL_VSTEPX ((CRL_HIGH_X-CRL_LOW_X)/CRL_RES_X)
 #define CRL_VSTEPY (CRL_HIGH_Y-CRL_LOW_Y)/CRL_RES_Y
+#define CRL_LINE_LEN    CRL_RES_Z*CRL_RES_X
+
 
 /**
- * callback at end of line
+ * Buffer filler thing
  *
+ **/
+
+void render_line(size_t L);
+
+/**
+ * Line end callback, pushes y-channel value
  **/
 
 static void line_end(DACDriver *dacp);
