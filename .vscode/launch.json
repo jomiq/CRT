@@ -5,6 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["${workspaceRoot}/tools/images/testimage"]
+
+        },
+        {
             "name": "ST-LINK V2.1",
             "servertype": "stutil",
             "type": "cortex-debug",
@@ -14,7 +23,6 @@
             "device": "STM32F746ZG",
             "svdFile": "${workspaceRoot}/tools/STM32F746.svd"
         },
-
         {
             "name": "Cortex Debug",
             "cwd": "${workspaceRoot}",

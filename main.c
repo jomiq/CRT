@@ -21,6 +21,7 @@
 #include "project.h"
 #include "crl.h"
 #include "image.h"
+//#include "test.h"
 
 
 uint8_t img[CRL_RES_X*CRL_RES_Y/2U];
@@ -49,12 +50,11 @@ int main(void) {
       img[j*CRL_RES_X + i] = 0x00U;
     }
   }*/
-  for(
-    size_t j = 0; j < CRL_RES_X*CRL_RES_Y/2U; j++){
-    img[j] = testimage[j];
-    //img[j] = 0xFFU;
+  for(size_t j = 0; j < CRL_RES_X*CRL_RES_Y/2U; j++){
+    //img[j] = testimage[j];
+    img[j] = 0x77U;
   }
-
+  crl_init();
   crl_start(img);
 
   /*
@@ -74,10 +74,13 @@ int main(void) {
     //sdWrite(&SD3, (uint8_t*) READY_MSG, READY_MSG_N);
     
     if (palReadLine(PORTAB_LINE_BUTTON) == PORTAB_BUTTON_PRESSED) {
-      gptStopTimer(&GPTD6);
-      dacStopConversion(&DACD1);
-      dacStopConversion(&DACD2);
-      palToggleLine(LINE_LED3);
+      crl_stop();
+      
+      for(size_t j = 0; j < CRL_RES_X*CRL_RES_Y/2U; j++){
+        img[j] = testimage[j];
+        //img[j] = 0x77U;
+      }
+      crl_start(img);
     }
     chThdSleepMilliseconds(500);
   }

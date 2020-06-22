@@ -2,17 +2,19 @@
 #include "crl.h"
 #include "crl_private.h"
 
+volatile uint8_t CRL_RUNNING;
+
 uint8_t * IMG_BFR;
 dacsample_t LINE_BFR[2][CRL_LINE_LEN];
 
 
-size_t  line = 0;
-uint8_t free_line = 0;
+size_t  line = 0;       // Logical line 
+uint8_t free_line = 0;  // This index the currently inactive buffer.
+dacsample_t line_value = CRL_HIGH_Y; // DAC y-channel output
 
-void crl_start(uint8_t * img){
-    /* Point to the buffer */
-    IMG_BFR = img;
-    
+void crl_init(void){
+    CRL_RUNNING = 0;
+
     /* System specific configuration */
     portab_setup();
 
@@ -22,29 +24,48 @@ void crl_start(uint8_t * img){
     /* Start DAC */
     dacStart(&DACD1, &X_dac1cfg1);
     dacStart(&DACD2, &Y_dac1cfg2);
+    
+}
 
+void crl_start(uint8_t * img){
+    
+    crl_stop();
 
+    /* Point to the buffer */
+    IMG_BFR = img;
     /* Starting a continuous conversion.*/
     line = 0;
+    free_line = 0;
+    line_value = CRL_HIGH_Y;
     render_line(line);
     dacPutChannelX(&DACD2, 1, (dacsample_t) line*CRL_VSTEPY);
     gptStartContinuous(&GPTD6, 2U);
-    dacStartConversion(&DACD1, &dacgrpcfg1, (dacsample_t *)LINE_BFR[free_line], CRL_LINE_LEN*2U);    
+    dacStartConversion(&DACD1, &dacgrpcfg1, (dacsample_t *)LINE_BFR[free_line], CRL_LINE_LEN*2U);
+    CRL_RUNNING = 1;
 
     /* GO */
 
 }
 
+void crl_stop(void){
+    if(CRL_RUNNING){
+        dacStopConversion(&DACD1);
+        gptStopTimer(&GPTD6);
+    }
+    CRL_RUNNING = 0;
+}
+
+
 /**
  * This rather complicated thing is basically rendering the image one line at a 
  * time into the inactive line buffer. There are @CRL_PPB pixels per byte and we 
- * need to shift out the 2-bit pixel values.
+ * need to shift out the 3/4-bit pixel values.
  *   
 */
 #ifdef CRL_ZMODE
 void render_line(size_t L){
 
-#ifdef CRL_DEBUG
+#if CRL_DEBUG
     palClearLine(PORTAB_LINE_LINESYNC);
 #endif // DEBUG
 
@@ -103,7 +124,7 @@ void render_line(size_t L){
         }
     }
 
-#ifdef CRL_DEBUG
+#if CRL_DEBUG
     palClearLine(PORTAB_LINE_LINESYNC);
 #endif // DEBUG
 
@@ -118,14 +139,16 @@ static void line_end(DACDriver *dacp){
 
     dacStopConversion(&DACD1);
     
-    dacPutChannelX(&DACD2, 1, (dacsample_t) line*CRL_VSTEPY);
+    dacPutChannelX(&DACD2, 1, (dacsample_t)line_value);
     dacStartConversion(dacp, &dacgrpcfg1, (dacsample_t *)LINE_BFR[free_line], CRL_LINE_LEN*2U);
     palClearLine(PORTAB_LINE_FRAMESYNC);
+    line_value -= CRL_VSTEPY;
     line++;
     if(line >= CRL_RES_Y)
     {
         palSetLine(PORTAB_LINE_FRAMESYNC);
         line = 0;
+        line_value = CRL_HIGH_Y;
     }
     free_line = !free_line;   
     render_line(line);

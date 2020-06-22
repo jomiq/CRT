@@ -21,9 +21,9 @@
 #define CRL_MASK  0b0111
 #endif
 
-#define CRL_VSTEPX ((CRL_HIGH_X-CRL_LOW_X)/CRL_RES_X)
-#define CRL_VSTEPY (CRL_HIGH_Y-CRL_LOW_Y)/CRL_RES_Y
-#define CRL_LINE_LEN    CRL_RES_Z*CRL_RES_X
+#define CRL_VSTEPX   (dacsample_t)((CRL_HIGH_X-CRL_LOW_X)/CRL_RES_X)
+#define CRL_VSTEPY   (dacsample_t)(CRL_HIGH_Y-CRL_LOW_Y)/CRL_RES_Y
+#define CRL_LINE_LEN (size_t)CRL_RES_Z*CRL_RES_X
 
 
 /**
