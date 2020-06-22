@@ -7,7 +7,7 @@
 
 #define CRL_PPB   2U         // Pixels per byte.
 
-#define CRL_LOW_X   CRL_X_MARGIN
+#define CRL_LOW_X   512U //CRL_X_MARGIN
 #define CRL_HIGH_X  (dacsample_t)4095U - CRL_X_MARGIN
 #define CRL_LOW_Y   CRL_Y_MARGIN
 #define CRL_HIGH_Y  (dacsample_t)4095U - CRL_Y_MARGIN

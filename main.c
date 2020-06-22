@@ -18,10 +18,8 @@
 #include "hal.h"
 #include "portab.h"
 
-#include "project.h"
 #include "crl.h"
-#include "image.h"
-//#include "test.h"
+#include "include/images.h"
 
 
 uint8_t img[CRL_RES_X*CRL_RES_Y/2U];
@@ -37,6 +35,8 @@ int main(void) {
    * - Kernel initialization, the main() function becomes a thread and the
    *   RTOS is active.
    */
+  uint8_t N = 0;
+
   halInit();
   chSysInit();
 
@@ -72,12 +72,18 @@ int main(void) {
   while (true) {
     //chThdSleepMilliseconds(500);
     //sdWrite(&SD3, (uint8_t*) READY_MSG, READY_MSG_N);
-    
     if (palReadLine(PORTAB_LINE_BUTTON) == PORTAB_BUTTON_PRESSED) {
+      palSetLine(PORTAB_LINE_LED1);
+      N++;
+      if(N == N_IMAGES) {
+        palClearLine(PORTAB_LINE_LED1);
+        N = 0;
+      }
+      
       crl_stop();
       
       for(size_t j = 0; j < CRL_RES_X*CRL_RES_Y/2U; j++){
-        img[j] = testimage[j];
+        img[j] = images[N][j];
         //img[j] = 0x77U;
       }
       crl_start(img);

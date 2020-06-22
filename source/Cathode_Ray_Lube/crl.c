@@ -62,7 +62,7 @@ void crl_stop(void){
  * need to shift out the 3/4-bit pixel values.
  *   
 */
-#ifdef CRL_ZMODE
+#if CRL_ZMODE
 void render_line(size_t L){
 
 #if CRL_DEBUG
@@ -80,16 +80,22 @@ void render_line(size_t L){
         linestart = L * CRL_RES_X/CRL_PPB;
 
         for(size_t b = linestart; b < linestart + CRL_RES_X/CRL_PPB; b++){
-            for(uint8_t i = 0; i < 8; i = i+4U){
-                pixel = (IMG_BFR[b] >> i) & CRL_MASK;
-                if(pixel){
-                    while(pixel){
-                        LINE_BFR[free_line][n++] = value;
-                        pixel--;
-                    }
+            pixel = (IMG_BFR[b] >> 4) & CRL_MASK;
+            if(pixel){
+                while(pixel){
+                    LINE_BFR[free_line][n++] = value;
+                    pixel--;
                 }
-                value += CRL_VSTEPX;
             }
+            value += CRL_VSTEPX;
+            pixel = IMG_BFR[b] & CRL_MASK;
+            if(pixel){
+                while(pixel){
+                    LINE_BFR[free_line][n++] = value;
+                    pixel--;
+                }
+            }
+            value += CRL_VSTEPX;
         }
         while (n < CRL_LINE_LEN)
         {
@@ -132,11 +138,42 @@ void render_line(size_t L){
 #else
 void render_line(size_t L){
 
+    size_t n;           // Line buffer index
+    size_t linestart;   // Image index
+    dacsample_t value;  // Output value
+    uint8_t pixel;      // Pixel value [3/4-bit]
+
+    n = 0;
+    value = CRL_LOW_X;
+    linestart = L * CRL_RES_X/CRL_PPB;
+
+    for(size_t b = linestart; b < linestart + CRL_RES_X/CRL_PPB; b++){
+        pixel = (IMG_BFR[b] >> 4) & CRL_MASK;
+        if(pixel){
+            while(pixel){
+                LINE_BFR[free_line][n++] = value;
+                pixel--;
+            }
+        }
+        value += CRL_VSTEPX;
+        pixel = IMG_BFR[b] & CRL_MASK;
+        if(pixel){
+            while(pixel){
+                LINE_BFR[free_line][n++] = value;
+                pixel--;
+            }
+        }
+        value += CRL_VSTEPX;
+    }
+    while(n < CRL_LINE_LEN)
+    {
+        LINE_BFR[free_line][n++] = (dacsample_t)0U;
+    }
 }
 #endif
 
 static void line_end(DACDriver *dacp){
-
+    palSetLine(PORTAB_LINE_LINESYNC);
     dacStopConversion(&DACD1);
     
     dacPutChannelX(&DACD2, 1, (dacsample_t)line_value);
@@ -152,5 +189,6 @@ static void line_end(DACDriver *dacp){
     }
     free_line = !free_line;   
     render_line(line);
+    palClearLine(PORTAB_LINE_LINESYNC);
 
 }

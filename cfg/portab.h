@@ -30,6 +30,7 @@
 /*===========================================================================*/
 
 #define PORTAB_LINE_LED1            LINE_LED1
+#define PORTAB_LINE_LED2            LINE_LED2
 #define PORTAB_LINE_FRAMESYNC       PAL_LINE(GPIOB, 8U)
 #define PORTAB_LINE_LINESYNC        PAL_LINE(GPIOC, 6U)
 #define PORTAB_LED_OFF              PAL_LOW
