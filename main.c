@@ -40,16 +40,6 @@ int main(void) {
   halInit();
   chSysInit();
 
-  /**
-   * Fill the buffer with some nonsense.
-   * 
-   * 
-  
-  for(size_t j = 0; j < CRL_RES_Y; j++){
-    for(size_t i = 0; i < CRL_RES_X/CRL_RES_Z; i++){
-      img[j*CRL_RES_X + i] = 0x00U;
-    }
-  }*/
   for(size_t j = 0; j < CRL_RES_X*CRL_RES_Y/2U; j++){
     //img[j] = testimage[j];
     img[j] = 0x77U;
@@ -57,21 +47,12 @@ int main(void) {
   crl_init();
   crl_start(img);
 
-  /*
-   * Activates the serial driver 3 using the driver default configuration.
-   */
-  //sdStart(&SD3, NULL);
-  /*
-   * Creates the blinky thread.
+  /**
+   * Main loop:
    */
 
-  /*
-   * Normal main() thread activity, in this demo it does nothing except
-   * sleeping in a loop and check the button state.
-   */
   while (true) {
-    //chThdSleepMilliseconds(500);
-    //sdWrite(&SD3, (uint8_t*) READY_MSG, READY_MSG_N);
+    // TEST: Cycle through image every time PORTAB_LINE_BUTTON goes low.
     if (palReadLine(PORTAB_LINE_BUTTON) == PORTAB_BUTTON_PRESSED) {
       palSetLine(PORTAB_LINE_LED1);
       N++;
@@ -84,7 +65,6 @@ int main(void) {
       
       for(size_t j = 0; j < CRL_RES_X*CRL_RES_Y/2U; j++){
         img[j] = images[N][j];
-        //img[j] = 0x77U;
       }
       crl_start(img);
     }

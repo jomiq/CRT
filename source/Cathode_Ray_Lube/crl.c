@@ -99,13 +99,13 @@ void render_line(size_t L){
         }
         while (n < CRL_LINE_LEN)
         {
-            LINE_BFR[free_line][n++] = (dacsample_t)4095U;
+            LINE_BFR[free_line][n++] = (dacsample_t)4094U;
         }
     }else{
         /* right-to-left */
         n = 0;
         value = CRL_HIGH_X;
-        linestart = (L+1) * CRL_RES_X/CRL_PPB;
+        linestart = (L+1) * CRL_RES_X/CRL_PPB - 1;
         for(size_t b = linestart; b > linestart - CRL_RES_X/CRL_PPB; b--){
             pixel = IMG_BFR[b] & CRL_MASK;
             if(pixel){
@@ -126,7 +126,7 @@ void render_line(size_t L){
         }
         while(n < CRL_LINE_LEN)
         {
-            LINE_BFR[free_line][n++] = (dacsample_t)0U;
+            LINE_BFR[free_line][n++] = (dacsample_t)1U;
         }
     }
 
